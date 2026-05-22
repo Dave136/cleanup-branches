@@ -14,3 +14,4 @@ categories = ["command-line-utilities", "development-tools"]
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 git2 = "0.20"
+openssl-sys = { version = "0.9", features = ["vendored"] }
