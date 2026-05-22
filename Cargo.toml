@@ -2,6 +2,13 @@
 name = "cleanup-branches"
 version = "0.1.0"
 edition = "2024"
+description = "A CLI tool to delete local Git branches that are already merged into a target branch"
+license = "MIT"
+repository = "https://github.com/Dave136/cleanup-branches"
+homepage = "https://github.com/Dave136/cleanup-branches"
+documentation = "https://docs.rs/cleanup-branches"
+keywords = ["git", "cli", "branch", "cleanup", "merge"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 anyhow = "1"
