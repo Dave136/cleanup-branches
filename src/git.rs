@@ -10,8 +10,12 @@ pub struct MergedBranch {
 }
 
 pub fn open_repo(path: &PathBuf) -> Result<Repository> {
-    Repository::open(path)
-        .with_context(|| format!("'{}' is not a Git repository or does not exist", path.display()))
+    Repository::open(path).with_context(|| {
+        format!(
+            "'{}' is not a Git repository or does not exist",
+            path.display()
+        )
+    })
 }
 
 pub fn resolve_base_oid(repo: &Repository, base_branch: &str) -> Result<Oid> {
@@ -25,7 +29,13 @@ pub fn resolve_base_oid(repo: &Repository, base_branch: &str) -> Result<Oid> {
         bail!("Branch '{base_branch}' does not exist locally or remotely");
     }
 
-    println!("{}", paint(Colour::Blue, &format!("Updating information for branch '{base_branch}'...")));
+    println!(
+        "{}",
+        paint(
+            Colour::Blue,
+            &format!("Updating information for branch '{base_branch}'...")
+        )
+    );
     fetch_base(repo, base_branch);
 
     repo.find_reference(&local_ref)
@@ -37,7 +47,9 @@ pub fn resolve_base_oid(repo: &Repository, base_branch: &str) -> Result<Oid> {
 }
 
 fn fetch_base(repo: &Repository, base_branch: &str) {
-    let Ok(mut remote) = repo.find_remote("origin") else { return };
+    let Ok(mut remote) = repo.find_remote("origin") else {
+        return;
+    };
     let refspec = format!("{base_branch}:{base_branch}");
     let mut opts = FetchOptions::new();
     let _ = remote.fetch(&[refspec.as_str()], Some(&mut opts), None);
@@ -52,8 +64,18 @@ pub fn current_branch_name(repo: &Repository) -> Option<String> {
     }
 }
 
-pub fn find_merged_branches(repo: &Repository, base_oid: Oid, base_branch: &str) -> Result<Vec<MergedBranch>> {
-    println!("{}", paint(Colour::Blue, &format!("Searching for branches merged into '{base_branch}'...")));
+pub fn find_merged_branches(
+    repo: &Repository,
+    base_oid: Oid,
+    base_branch: &str,
+) -> Result<Vec<MergedBranch>> {
+    println!(
+        "{}",
+        paint(
+            Colour::Blue,
+            &format!("Searching for branches merged into '{base_branch}'...")
+        )
+    );
 
     let branches = repo
         .branches(Some(BranchType::Local))
@@ -86,16 +108,25 @@ pub fn delete_branches(repo: &Repository, branches: &[&MergedBranch]) -> (usize,
         match repo.find_branch(&b.name, BranchType::Local) {
             Ok(mut branch) => match branch.delete() {
                 Ok(_) => {
-                    println!("  {}", paint(Colour::Green, &format!("✓ Deleted: {}", b.name)));
+                    println!(
+                        "  {}",
+                        paint(Colour::Green, &format!("✓ Deleted: {}", b.name))
+                    );
                     deleted += 1;
                 }
                 Err(e) => {
-                    println!("  {}", paint(Colour::Red, &format!("✗ Error deleting '{}': {e}", b.name)));
+                    println!(
+                        "  {}",
+                        paint(Colour::Red, &format!("✗ Error deleting '{}': {e}", b.name))
+                    );
                     failed += 1;
                 }
             },
             Err(e) => {
-                println!("  {}", paint(Colour::Red, &format!("✗ Error finding '{}': {e}", b.name)));
+                println!(
+                    "  {}",
+                    paint(Colour::Red, &format!("✗ Error finding '{}': {e}", b.name))
+                );
                 failed += 1;
             }
         }

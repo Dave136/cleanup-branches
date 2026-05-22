@@ -7,9 +7,10 @@ use clap::Parser;
 use anyhow::{Context, Result};
 
 use crate::colour::{Colour, paint};
-use crate::git::{MergedBranch, current_branch_name, delete_branches, find_merged_branches, open_repo, resolve_base_oid};
-
-
+use crate::git::{
+    MergedBranch, current_branch_name, delete_branches, find_merged_branches, open_repo,
+    resolve_base_oid,
+};
 
 #[derive(Parser)]
 #[command(
@@ -38,10 +39,18 @@ pub struct Args {
 }
 
 pub fn confirm_deletion() -> Result<bool> {
-    print!("{} ", paint(Colour::Yellow, "Do you want to delete these branches? (y/N):"));
+    print!(
+        "{} ",
+        paint(
+            Colour::Yellow,
+            "Do you want to delete these branches? (y/N):"
+        )
+    );
     io::stdout().flush().context("Failed to flush stdout")?;
     let mut input = String::new();
-    io::stdin().read_line(&mut input).context("Failed to read input")?;
+    io::stdin()
+        .read_line(&mut input)
+        .context("Failed to read input")?;
     Ok(matches!(input.trim(), "y" | "Y"))
 }
 
@@ -54,18 +63,45 @@ pub fn run() -> Result<()> {
     let merged = find_merged_branches(&repo, base_oid, &args.base_branch)?;
 
     if merged.is_empty() {
-        println!("{}", paint(Colour::Green, &format!("No local branches merged into '{}' to delete.", args.base_branch)));
+        println!(
+            "{}",
+            paint(
+                Colour::Green,
+                &format!(
+                    "No local branches merged into '{}' to delete.",
+                    args.base_branch
+                )
+            )
+        );
         return Ok(());
     }
 
-    println!("{}", paint(Colour::Yellow, &format!("Found {} merged branch(es):", merged.len())));
+    println!(
+        "{}",
+        paint(
+            Colour::Yellow,
+            &format!("Found {} merged branch(es):", merged.len())
+        )
+    );
     println!();
 
     for b in &merged {
         if current.as_deref() == Some(b.name.as_str()) {
-            println!("  {}", paint(Colour::Yellow, &format!("* {} (current branch, will be skipped)", b.name)));
+            println!(
+                "  {}",
+                paint(
+                    Colour::Yellow,
+                    &format!("* {} (current branch, will be skipped)", b.name)
+                )
+            );
         } else if args.ignore.contains(&b.name) {
-            println!("  {}", paint(Colour::Blue, &format!("* {} (ignored, will be skipped)", b.name)));
+            println!(
+                "  {}",
+                paint(
+                    Colour::Blue,
+                    &format!("* {} (ignored, will be skipped)", b.name)
+                )
+            );
         } else {
             println!("  {}", paint(Colour::Green, &format!("- {}", b.name)));
         }
@@ -74,18 +110,25 @@ pub fn run() -> Result<()> {
 
     let to_delete: Vec<&MergedBranch> = merged
         .iter()
-        .filter(|b| {
-            current.as_deref() != Some(b.name.as_str()) && !args.ignore.contains(&b.name)
-        })
+        .filter(|b| current.as_deref() != Some(b.name.as_str()) && !args.ignore.contains(&b.name))
         .collect();
 
     if to_delete.is_empty() {
-        println!("{}", paint(Colour::Yellow, "No branches to delete (all are the current branch or ignored)."));
+        println!(
+            "{}",
+            paint(
+                Colour::Yellow,
+                "No branches to delete (all are the current branch or ignored)."
+            )
+        );
         return Ok(());
     }
 
     if args.dry_run {
-        println!("{}", paint(Colour::Blue, "Dry-run mode: No branches will be deleted."));
+        println!(
+            "{}",
+            paint(Colour::Blue, "Dry-run mode: No branches will be deleted.")
+        );
         return Ok(());
     }
 
@@ -98,9 +141,21 @@ pub fn run() -> Result<()> {
 
     println!();
     if failed == 0 {
-        println!("{}", paint(Colour::Green, &format!("✓ Process completed. Deleted {deleted} branch(es).")));
+        println!(
+            "{}",
+            paint(
+                Colour::Green,
+                &format!("✓ Process completed. Deleted {deleted} branch(es).")
+            )
+        );
     } else {
-        println!("{}", paint(Colour::Yellow, &format!("⚠ Process completed with errors. Deleted: {deleted}, Failed: {failed}")));
+        println!(
+            "{}",
+            paint(
+                Colour::Yellow,
+                &format!("⚠ Process completed with errors. Deleted: {deleted}, Failed: {failed}")
+            )
+        );
     }
 
     Ok(())

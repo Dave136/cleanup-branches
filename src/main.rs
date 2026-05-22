@@ -1,4 +1,7 @@
-use crate::{cli::run, colour::{Colour, paint}};
+use crate::{
+    cli::run,
+    colour::{Colour, paint},
+};
 
 mod cli;
 mod colour;
