@@ -15,6 +15,12 @@ esac
 # prepare the download URL
 GITHUB_LATEST_VERSION=$(curl -L -s -H 'Accept: application/json' https://github.com/Dave136/cleanup-branches/releases/latest | sed -e 's/.*"tag_name":"\([^"]*\)".*/\1/')
 GITHUB_FILE="cleanup-branches-${ARCH}-unknown-linux-gnu.tar.gz"
+
+# Verify architecture is supported (x86_64 or aarch64)
+if [[ "$ARCH" != "x86_64" && "$ARCH" != "aarch64" ]]; then
+    echo "Unsupported architecture: $ARCH. Only x86_64 and aarch64 are supported." >&2
+    exit 1
+fi
 GITHUB_URL="https://github.com/Dave136/cleanup-branches/releases/download/${GITHUB_LATEST_VERSION}/${GITHUB_FILE}"
 
 echo "Installing cleanup-branches ${GITHUB_LATEST_VERSION} for ${ARCH}..."
