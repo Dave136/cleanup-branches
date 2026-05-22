@@ -13,6 +13,22 @@ A fast CLI tool to delete local Git branches that have already been merged into 
 
 ## Installation
 
+### Binary release (Linux x86_64/aarch64)
+
+Use the automated install script:
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Dave136/cleanup-branches/main/install.sh | sh
+```
+
+The default installation directory is `~/.local/bin`. To install elsewhere, set the `DIR` variable:
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/Dave136/cleanup-branches/main/install.sh | DIR=/usr/local/bin sh
+```
+
+Or download and extract a release manually from the [releases page](https://github.com/Dave136/cleanup-branches/releases).
+
 ### From source
 
 Requires [Rust](https://rustup.rs/) (edition 2024, stable toolchain).
@@ -27,6 +43,29 @@ The binary will be at `target/release/cleanup-branches`. Copy it anywhere on you
 
 ```sh
 cp target/release/cleanup-branches ~/.local/bin/
+```
+
+### Optional: Alias and system-wide installation
+
+**Create a shorter alias (`cb`):**
+
+Add to your shell configuration (`.bashrc`, `.zshrc`, etc.):
+
+```sh
+alias cb='cleanup-branches'
+```
+
+Or install via `cargo` and create a system-wide symlink:
+
+```sh
+# Install with cargo
+cargo install --path .
+
+# Create symlink in /usr/bin (requires sudo)
+sudo ln -s ~/.cargo/bin/cleanup-branches /usr/bin/cleanup-branches
+
+# Optional: also symlink the short alias
+sudo ln -s ~/.cargo/bin/cleanup-branches /usr/bin/cb
 ```
 
 ## Usage
@@ -81,3 +120,7 @@ The tool opens the repository with `git2` and fetches the latest state of the ba
 | [`clap`](https://crates.io/crates/clap) | CLI argument parsing |
 | [`git2`](https://crates.io/crates/git2) | Libgit2 bindings for repository operations |
 | [`anyhow`](https://crates.io/crates/anyhow) | Ergonomic error handling |
+
+## License
+
+[MIT](./LICENSE)
